@@ -623,4 +623,5 @@ vSphere client:   https://vcenter.home.lab/ui/app/home
 
 #### KVM - libvirt
 
-- libvirt - networking : https://fabianlee.org/2018/11/06/kvm-deploy-the-vmware-vcenter-appliance-using-the-cli-installer/
+- libvirt - networking : https://wiki.libvirt.org/page/Networking
+
