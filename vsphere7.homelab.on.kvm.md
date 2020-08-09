@@ -12,7 +12,7 @@ This document describes the deployment of a basic vSphere  7  lab hosted in a ne
 
 The diagram below summarizes the deployment
 
-![](vsphere7.homelab.on.kvm.assets/deployment.diagram.v1.png)
+![image-20200809063024244](vsphere7.homelab.on.kvm.assets/image-20200809063024244.png)
 
 **Motivation**:  Deploying a vSphere nested environment in KVM is admittedly not very practical.   Most people would recommend using ESXi as the base hypervisor for these experiments.   
 
@@ -38,7 +38,7 @@ The main differences  and additions to those sources from this experiment :
   - Use additional KVM "isolated networks" (additional NICs in the ESXi hosts) in addition to the KVM default network 
   - (TODO) explore dedicated network for VMotion and Management (heartbeat)
 - Storage :  (TODO) explore FreeNAS for iSCSI and/or NFS storage in addition to local disks.
-- Others:  Use VMware Photon VMs (OVF) for testing instead of net
+- Others:  Use VMware Photon VMs (OVF) for testing instead of an ubuntu net ISO image.
 
 ### Initial Experience
 
@@ -194,11 +194,11 @@ Running hypervisor: QEMU 4.2.0
 -  An alternative to editing the network definition XML file is to use the 'virsh net-update' command, issuing one command per host:
 
    ``` 
-   virsh net-update default add dns-host  "<host ip='192.168.122.120'><hostname>vcenter.home.lab</hostname></host>" --config --live
+   $ virsh net-update default add dns-host  "<host ip='192.168.122.120'><hostname>vcenter.home.lab</hostname></host>" --config --live
    
-   virsh net-update default add dns-host  "<host ip='192.168.122.121'><hostname>esxi21.home.lab</hostname></host>" --config --live
+   $ virsh net-update default add dns-host  "<host ip='192.168.122.121'><hostname>esxi21.home.lab</hostname></host>" --config --live
    
-   virsh net-update default add dns-host  "<host ip='192.168.122.122'><hostname>esxi22.home.lab</hostname></host>" --config --live
+   $ virsh net-update default add dns-host  "<host ip='192.168.122.122'><hostname>esxi22.home.lab</hostname></host>" --config --live
    
    ```
 
@@ -213,9 +213,14 @@ Running hypervisor: QEMU 4.2.0
   ```
   $ cat /etc/hosts
   (...)
+  # vSphere 7.0 lab
   192.168.122.120 vcenter vcenter.home.lab
   192.168.122.121 esxi21 esxi21.home.lab
   192.168.122.122 esxi22 esxi22.home.lab
+  # vSphere 6.7 lab
+  192.168.122.110 vcenter0 vcenter0.home.lab
+  192.168.122.111 esxi11 esxi21.home.lab
+  192.168.122.112 esxi12 esxi12.home.lab
   (...)
   ```
 
@@ -230,7 +235,7 @@ Running hypervisor: QEMU 4.2.0
 
 #### NTP
 
-- We configure the VMs to access directly NTP servers in Internet.
+- We configure the VMs to access directly NTP servers (pool.ntp.org) in Internet.
 
 #### Creation of an isolated network in KVM
 
@@ -337,7 +342,7 @@ This virtual network can also be seen using the Virtual Machine Manger (virt-mgr
 ### ESXi VM parameters:
 
 - VM Name : esxi21
-- RAM : initially allocate 17G to allow for the vCenter Installation (requires 16G)
+- RAM : initially allocate 20G to allow for the vCenter Installation (requires 19G to start process)
 - 2 disks 
   - 10G disk to host ESXi and (TODO: finetune size)
   - 30G disk for datastore(s). 
@@ -358,7 +363,7 @@ We use here a modified version of Fabian Lee's command to account for the VM par
 $ virt-install --virt-type=kvm --name=esxi21 --ram 17000 --vcpus=4 --virt-type=kvm --hvm --cdrom /path/to/esxi/installer/VMware-VMvisor-Installer-7.0b-16324942.x86_64.iso --network network:default,model=vmxnet3 --network network:priv1,model=vmxnet3 --network network:priv2,model=vmxnet3 --graphics vnc --video qxl --disk pool=default,size=10,sparse=true,bus=ide,format=qcow2 --disk pool=default,size=30,sparse=true,bus=ide,format=qcow2 --boot cdrom,hd --noautoconsole --force --cpu host
 ```
 
-If the command succeds,  KVM will launch the *esxi21* VM and it will boot from the installer ISO.
+If the command succeeds, KVM will launch the *esxi21* VM and it will boot from the installer ISO.
 
 The installation progress can be followed in the console opening the VM in *virt-mgr* or using the *virt-viewer* utility
 
@@ -404,12 +409,12 @@ We verify that the host is also accessible via web interface (note that the addr
 
 Perform basic configuration and testing of the ESXi Host:
 
-- Network configuration (managment):
+- Network configuration (management):
   - Static IP address configuration :  
     - IP : 192.168.122.121/24
     - Default gateway : 192.168.122.1
     - DNS server : 192.168.122.1   (dnsmaq instance specific to the KVM default network)
-  - Host Name : esxi1
+  - Host Name : esxi21
   - DNS suffix (appended to DNS queries) : home.lab
 - Enable ssh server and esxcli   
 - Create a Datastore (will use GUI) - unlike in the case of vSphere 6.7,  a datastore is not automatically created based on the boot disk.
@@ -440,7 +445,7 @@ Once logged in, select **Configure Management Network  /  IPv4 Configuration**
 
 **Configure Management Network  /  DNS Suffixes**
 
-- Select suffix(es) that will be appended short names when performing dns queries (e.g. a query for esxi33 will result in esxi33.home.lab) - in this case we are using "home.lab"
+- Select suffix(es) that will be appended short names when performing dns queries (e.g. a query for esxi13 will result in esxi13.home.lab) - in this case we are using "home.lab"
 
 ![esxi.post.boot.06.custom.dns.suffixes](vsphere7.homelab.on.kvm.assets/esxi.post.boot.06.custom.dns.suffixes.png)
 
@@ -449,6 +454,8 @@ Confirm changes and Restart Management Network to activate new parameters
 ![esxi.post.boot.07.confirm.mgmt.network.changes](vsphere7.homelab.on.kvm.assets/esxi.post.boot.07.confirm.mgmt.network.changes.png)
 
 Verify that we can ping the new esxi21 VM from the KVM Hypervisor,  both using the IP address (192.168.122.121) and the host name  (esxi21 or esxi21.home.lab)
+
+Verify connectivity to the host using the GUI interface.  Connect with a browser to http://192.168.122.112 or http://esxi12 .  Ignore warnings about certificates for the time being.
 
 #### Create a Datastore
 
