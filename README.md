@@ -3,6 +3,10 @@ Home lab nested installation of vSphere 7 on KVM
 
 This document describes the deployment of a basic vSphere  7  lab hosted in a nested  Linux KVM environment.
 
+A similar lab using vSphere 6.7 is documented in a separate [github repository](https://github.com/rpgd60/vmware-vsphere6.7-on-kvm-lab).
+
+NOTE: Initial experience shows that the 6.7 lab works better than the 7.0 lab due to the simpler vCenter installation and lower level of RAM/Disk/CPU requirements of the former.  Thus this document for vSphere 7.0 is not being maintained actively.
+
 The diagram below summarizes the deployment
 
 <img src="README.assets/Deployment diagram vSphere 7.0.png" alt="Deployment Diagram - vSphere 7.0" style="zoom:75%;" />
