@@ -5,7 +5,7 @@ This document describes the deployment of a basic vSphere  7  lab hosted in a ne
 
 The diagram below summarizes the deployment
 
-![Deployment Diagram - vSphere 7.0](README.assets/Deployment diagram vSphere 7.0-1597034214346.png)
+<img src="README.assets/Deployment diagram vSphere 7.0.png" alt="Deployment Diagram - vSphere 7.0" style="zoom:75%;" />
 
 **Motivation**:  Deploying a vSphere nested environment in KVM is admittedly not very practical.   Most people would recommend using ESXi as the base hypervisor for these experiments.   
 
