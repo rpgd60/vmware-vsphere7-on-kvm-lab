@@ -5,7 +5,7 @@ This document describes the deployment of a basic vSphere  7  lab hosted in a ne
 
 A similar lab using vSphere 6.7 is documented in a separate [github repository](https://github.com/rpgd60/vmware-vsphere6.7-on-kvm-lab).
 
-NOTE: Initial experience shows that the 6.7 lab works better than the 7.0 lab due to the simpler vCenter installation and lower level of RAM/Disk/CPU requirements of the former.  Thus this document for vSphere 7.0 is not being maintained actively.
+NOTE: Initial experience shows that the 6.7 lab works better than the 7.0 lab due to the simpler vCenter installation and lower level of RAM/Disk/CPU requirements of the former.  **Thus this document for vSphere 7.0 is not currently being maintained actively.** Please refer to the vSphere 6.7 [github repository](https://github.com/rpgd60/vmware-vsphere6.7-on-kvm-lab).
 
 The diagram below summarizes the deployment
 
