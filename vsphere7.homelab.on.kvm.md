@@ -601,7 +601,7 @@ Stage 2 Complete  - Installed vCenter
 
 vSphere client:   https://vcenter.home.lab/ui/app/home
 
-- Created a datacenter and cluster and assigned esxi12 host
+- Created a datacenter and assigned esxi12 host
 
 ![image-20200807055346947](vsphere7.homelab.on.kvm.assets/image-20200807055346947.png)
 
